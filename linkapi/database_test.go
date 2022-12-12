@@ -1,7 +1,6 @@
 package linkapi
 
 import (
-	"os"
 	"path/filepath"
 	"sort"
 	"testing"
@@ -13,11 +12,7 @@ import (
 func TestDatabaseCreate(t *testing.T) {
 	assert := assert.New(t)
 	// Creating temp dir for testing
-	tempDir, err := os.MkdirTemp("./", "testing")
-	if !assert.Nil(err, "temp dir creation should work") {
-		assert.FailNow("temp dir creation didn't work")
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	// Creating database
 	handler, err := MakeDbHandler(filepath.Join(tempDir, "dbcreate.db"))
@@ -69,11 +64,7 @@ func TestDatabaseLinks(t *testing.T) {
 	}
 	assert := assert.New(t)
 	// Creating temp dir for testing
-	tempDir, err := os.MkdirTemp("./", "testing")
-	if !assert.Nil(err, "temp dir creation should work") {
-		assert.FailNow("temp dir creation didn't work")
-	}
-	defer os.RemoveAll(tempDir)
+	tempDir := t.TempDir()
 
 	// Creating database
 	handler, err := MakeDbHandler(filepath.Join(tempDir, "dbcreate.db"))
@@ -119,9 +110,53 @@ func TestDatabaseLinks(t *testing.T) {
 	}
 }
 
-// TODO: CreateArticle, GetName, GetId
 func TestDatabaseArticles(t *testing.T) {
+	var arts = map[string]uint32{
+		"Henlo": 1, "Does": 2, "This": 3, "Work?": 4, "טקסט": 5,
+	}
 
+	assert := assert.New(t)
+	// Creating temp dir for testing
+	tempDir := t.TempDir()
+
+	// Creating database
+	handler, err := MakeDbHandler(filepath.Join(tempDir, "dbcreate.db"))
+	if !assert.Nil(err, "handler creation should work") {
+		assert.FailNow("handler creation didn't work")
+	}
+	defer handler.Close()
+
+	// Creating bucekts
+	if !assert.Nil(handler.CreateBuckets(), "creating buckets should work") {
+		assert.FailNow("creating buckets didn't work")
+	}
+
+	// Creating articles
+	for k, v := range arts {
+		if err := handler.CreateArticle(k, v); err != nil {
+			assert.FailNow("should not error creating articles")
+		}
+	}
+
+	// Getting ids and names
+	for k, v := range arts {
+		// Getting id
+		gotId, err := handler.GetId(k)
+		if err != nil {
+			assert.FailNow("should not getting ids")
+		}
+		if !assert.Equal(v, gotId) {
+			assert.FailNow("should equal original id")
+		}
+		// Getting name
+		gotName, err := handler.GetName(v)
+		if err != nil {
+			assert.FailNow("should not getting names")
+		}
+		if !assert.Equal(k, gotName) {
+			assert.FailNow("should equal original name")
+		}
+	}
 }
 
 func TestBytesToIds(t *testing.T) {

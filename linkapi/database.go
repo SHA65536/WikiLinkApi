@@ -73,21 +73,6 @@ func (d *DatabaseHandler) CreateArticle(name string, id uint32) error {
 	})
 }
 
-// AddLink creates a connection in the database, in the incoming and outgoing buckets
-func (d *DatabaseHandler) AddLink(src, dst uint32) error {
-	var src_bytes = make([]byte, 4)
-	var dst_bytes = make([]byte, 4)
-	binary.LittleEndian.PutUint32(src_bytes, src)
-	binary.LittleEndian.PutUint32(dst_bytes, dst)
-	if err := d.createLink(src_bytes, dst_bytes, dst, OutLinksBucket); err != nil {
-		return err
-	}
-	if err := d.createLink(dst_bytes, src_bytes, src, InLinksBucket); err != nil {
-		return err
-	}
-	return nil
-}
-
 // AddLinks creates multiple connections in the database, in the incoming and outgoing buckets
 func (d *DatabaseHandler) AddLinks(src uint32, dst []uint32) error {
 	var src_bytes = make([]byte, 4)
