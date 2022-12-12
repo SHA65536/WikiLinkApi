@@ -56,6 +56,11 @@ func TestDatabaseCreate(t *testing.T) {
 	}
 }
 
+// TODO: implements
+func TestDatabaseLinks(t *testing.T) {
+
+}
+
 func TestBytesToIds(t *testing.T) {
 	assert := assert.New(t)
 	var nums = []uint32{1, 2, 3, 4, 5, 1337, ^uint32(0)}

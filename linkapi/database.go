@@ -116,28 +116,66 @@ func (d *DatabaseHandler) createLink(src, dst []byte, dstint uint32, bucket []by
 	})
 }
 
-// TODO: implement
 // GetName returns article name by given id
 func (d *DatabaseHandler) GetName(id uint32) (string, error) {
-	return "", nil
+	var res string
+	var id_bytes = make([]byte, 4)
+	binary.LittleEndian.PutUint32(id_bytes, id)
+	return res, d.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(IdToNameBucket)
+		v := b.Get(id_bytes)
+		if v == nil {
+			return fmt.Errorf("id %d not found", id)
+		}
+		res = string(v)
+		return nil
+	})
 }
 
-// TODO: implement
 // GetId returns article id by given name
 func (d *DatabaseHandler) GetId(name string) (uint32, error) {
-	return 0, nil
+	var res uint32
+	return res, d.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(NameToIdBucket)
+		v := b.Get([]byte(name))
+		if v == nil {
+			return fmt.Errorf("name %s not found", name)
+		}
+		res = binary.LittleEndian.Uint32(v)
+		return nil
+	})
 }
 
-// TODO: implement
 // GetOutgoing returns article ids by given source id
 func (d *DatabaseHandler) GetOutgoing(id uint32) ([]uint32, error) {
-	return nil, nil
+	var res []uint32
+	var id_bytes = make([]byte, 4)
+	binary.LittleEndian.PutUint32(id_bytes, id)
+	return res, d.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(OutLinksBucket)
+		v := b.Get(id_bytes)
+		if v == nil {
+			return nil
+		}
+		res = bytesToIds(v)
+		return nil
+	})
 }
 
-// TODO: implement
 // GetOutgoing returns article ids by given destination id
 func (d *DatabaseHandler) GetIncoming(id uint32) ([]uint32, error) {
-	return nil, nil
+	var res []uint32
+	var id_bytes = make([]byte, 4)
+	binary.LittleEndian.PutUint32(id_bytes, id)
+	return res, d.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(InLinksBucket)
+		v := b.Get(id_bytes)
+		if v == nil {
+			return nil
+		}
+		res = bytesToIds(v)
+		return nil
+	})
 }
 
 // bytesToIds converts a byteslice to uint32s
