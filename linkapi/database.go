@@ -8,6 +8,7 @@ import (
 	bolt "go.etcd.io/bbolt"
 )
 
+// Bucket names
 var IdToNameBucket = []byte("id-name")
 var NameToIdBucket = []byte("name-id")
 var OutLinksBucket = []byte("outlinks")
@@ -113,6 +114,30 @@ func (d *DatabaseHandler) createLink(src, dst []byte, dstint uint32, bucket []by
 		}
 		return nil
 	})
+}
+
+// TODO: implement
+// GetName returns article name by given id
+func (d *DatabaseHandler) GetName(id uint32) (string, error) {
+	return "", nil
+}
+
+// TODO: implement
+// GetId returns article id by given name
+func (d *DatabaseHandler) GetId(name string) (uint32, error) {
+	return 0, nil
+}
+
+// TODO: implement
+// GetOutgoing returns article ids by given source id
+func (d *DatabaseHandler) GetOutgoing(id uint32) ([]uint32, error) {
+	return nil, nil
+}
+
+// TODO: implement
+// GetOutgoing returns article ids by given destination id
+func (d *DatabaseHandler) GetIncoming(id uint32) ([]uint32, error) {
+	return nil, nil
 }
 
 // bytesToIds converts a byteslice to uint32s
