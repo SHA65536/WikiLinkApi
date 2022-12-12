@@ -1,7 +1,6 @@
 package linkapi
 
 import (
-	"encoding/binary"
 	"os"
 	"path/filepath"
 	"testing"
@@ -64,13 +63,10 @@ func TestDatabaseLinks(t *testing.T) {
 func TestBytesToIds(t *testing.T) {
 	assert := assert.New(t)
 	var nums = []uint32{1, 2, 3, 4, 5, 1337, ^uint32(0)}
-	var bytes = []byte{}
-	var temp = make([]byte, 4)
+
 	// Encoding numbers to binary
-	for i := range nums {
-		binary.LittleEndian.PutUint32(temp, nums[i])
-		bytes = append(bytes, temp...)
-	}
+	var bytes = idsToBytes(nums)
+
 	// Decoding numbers from binary
 	for i, num := range bytesToIds(bytes) {
 		if !assert.Equal(nums[i], num, "decoding should be same as encoding") {

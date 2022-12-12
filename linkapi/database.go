@@ -88,6 +88,28 @@ func (d *DatabaseHandler) AddLink(src, dst uint32) error {
 	return nil
 }
 
+// AddLinks creates multiple connections in the database, in the incoming and outgoing buckets
+func (d *DatabaseHandler) AddLinks(src uint32, dst []uint32) error {
+	var src_bytes = make([]byte, 4)
+	binary.LittleEndian.PutUint32(src_bytes, src)
+	// Adding outgoing links
+	err := d.DB.Update(func(tx *bolt.Tx) error {
+		var dst_data = idsToBytes(dst)
+		b := tx.Bucket(OutLinksBucket)
+		return b.Put(src_bytes, dst_data)
+	})
+	if err != nil {
+		return err
+	}
+	// Adding incoming links
+	for i := range dst {
+		if err := d.AddLink(dst[i], src); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // createLink makes a connection in a given bucket
 func (d *DatabaseHandler) createLink(src, dst []byte, dstint uint32, bucket []byte) error {
 	return d.DB.Update(func(tx *bolt.Tx) error {
@@ -186,4 +208,22 @@ func bytesToIds(data []byte) []uint32 {
 		res[i] = binary.LittleEndian.Uint32(data[i*4 : (i+1)*4])
 	}
 	return res
+}
+
+// idsToBytes converts a list of uint32 ids to a byteslice
+func idsToBytes(nums []uint32) []byte {
+	// Allocate a slice of bytes with the same length as the input slice
+	bytes := make([]byte, len(nums)*4)
+
+	// Iterate over the input slice of uint32 numbers
+	for i, n := range nums {
+		// Write the bytes of the current uint32 number in little endian order
+		// to the correct offset in the slice of bytes
+		bytes[i*4] = byte(n)
+		bytes[i*4+1] = byte(n >> 8)
+		bytes[i*4+2] = byte(n >> 16)
+		bytes[i*4+3] = byte(n >> 24)
+	}
+
+	return bytes
 }
