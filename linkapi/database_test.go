@@ -174,7 +174,10 @@ func TestBytesToIds(t *testing.T) {
 	}
 }
 
-// TODO: benchmark :)
 func BenchmarkBytesToIds(b *testing.B) {
-
+	for i := 0; i < b.N; i++ {
+		var nums = []uint32{1, 2, 3, 4, 5, 1337, ^uint32(0)}
+		var bytes = idsToBytes(nums)
+		bytesToIds(bytes)
+	}
 }
