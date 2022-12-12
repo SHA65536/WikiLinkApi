@@ -91,19 +91,19 @@ func (d *DatabaseHandler) AddLink(src, dst uint32) error {
 // AddLinks creates multiple connections in the database, in the incoming and outgoing buckets
 func (d *DatabaseHandler) AddLinks(src uint32, dst []uint32) error {
 	var src_bytes = make([]byte, 4)
+	var dst_bytes = idsToBytes(dst)
 	binary.LittleEndian.PutUint32(src_bytes, src)
 	// Adding outgoing links
 	err := d.DB.Update(func(tx *bolt.Tx) error {
-		var dst_data = idsToBytes(dst)
 		b := tx.Bucket(OutLinksBucket)
-		return b.Put(src_bytes, dst_data)
+		return b.Put(src_bytes, dst_bytes)
 	})
 	if err != nil {
 		return err
 	}
 	// Adding incoming links
 	for i := range dst {
-		if err := d.AddLink(dst[i], src); err != nil {
+		if err := d.createLink(dst_bytes[i*4:(i+1)*4], src_bytes, dst[i], InLinksBucket); err != nil {
 			return err
 		}
 	}
