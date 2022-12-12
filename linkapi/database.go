@@ -123,6 +123,18 @@ func (d *DatabaseHandler) createLink(src, dst []byte, dstint uint32, bucket []by
 	})
 }
 
+// GetAllArticles returns a map of all articles and their Id's
+func (d *DatabaseHandler) GetAllArticles() (map[string]uint32, error) {
+	var res = map[string]uint32{}
+	return res, d.DB.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(NameToIdBucket)
+		return b.ForEach(func(k, v []byte) error {
+			res[string(k)] = binary.LittleEndian.Uint32(v)
+			return nil
+		})
+	})
+}
+
 // GetName returns article name by given id
 func (d *DatabaseHandler) GetName(id uint32) (string, error) {
 	var res string

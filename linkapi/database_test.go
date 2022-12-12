@@ -157,6 +157,13 @@ func TestDatabaseArticles(t *testing.T) {
 			assert.FailNow("should equal original name")
 		}
 	}
+
+	// Getting nameid map
+	res, err := handler.GetAllArticles()
+	if err != nil {
+		assert.FailNow("should not error on getAllArticles")
+	}
+	assert.Equal(arts, res, "GetAllArticles should equal original map")
 }
 
 func TestBytesToIds(t *testing.T) {
