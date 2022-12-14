@@ -1,11 +1,11 @@
 package linkapi
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/render"
 )
 
 type ApiHandler struct {
@@ -54,24 +54,21 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	// Must have both params
 	if end == "" || start == "" {
 		res.Error = "must have 'start' and 'end' parameters!"
-		v, _ := json.Marshal(res)
-		w.Write(v)
+		render.JSON(w, r, res)
 		return
 	}
 	// Finding start param
 	startId, err := a.DB.GetId(start)
 	if err != nil {
 		res.Error = "start article not found!"
-		v, _ := json.Marshal(res)
-		w.Write(v)
+		render.JSON(w, r, res)
 		return
 	}
 	// Finding end param
 	endId, err := a.DB.GetId(end)
 	if err != nil {
 		res.Error = "end article not found!"
-		v, _ := json.Marshal(res)
-		w.Write(v)
+		render.JSON(w, r, res)
 		return
 	}
 
@@ -79,8 +76,7 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	res.ResultIds, err = a.Search.ShortestPath(startId, endId, func(i int) {})
 	if err != nil {
 		res.Error = "could not find path!"
-		v, _ := json.Marshal(res)
-		w.Write(v)
+		render.JSON(w, r, res)
 		return
 	}
 
@@ -88,10 +84,8 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	res.ResultTitles, err = a.DB.IdsToNames(res.ResultIds...)
 	if err != nil {
 		res.Error = "error parsing path!"
-		v, _ := json.Marshal(res)
-		w.Write(v)
+		render.JSON(w, r, res)
 		return
 	}
-	v, _ := json.Marshal(res)
-	w.Write(v)
+	render.JSON(w, r, res)
 }
