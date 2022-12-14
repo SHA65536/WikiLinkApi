@@ -158,6 +158,14 @@ func TestDatabaseArticles(t *testing.T) {
 		}
 	}
 
+	names, err := handler.IdsToNames(1, 2, 3, 4, 5)
+	if err != nil {
+		assert.FailNow("IdsToNames should not error")
+	}
+	if !assert.Equal(names, []string{"Henlo", "Does", "This", "Work?", "טקסט"}) {
+		assert.FailNow("List of names should equal original")
+	}
+
 	// Getting nameid map
 	res, err := handler.GetAllArticles()
 	if err != nil {

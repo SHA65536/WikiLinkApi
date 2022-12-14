@@ -197,6 +197,19 @@ func (d *DatabaseHandler) GetIncoming(id uint32) ([]uint32, error) {
 	})
 }
 
+// IdsToNames returns a list of names of given ids
+func (d *DatabaseHandler) IdsToNames(ids ...uint32) ([]string, error) {
+	var res = make([]string, len(ids))
+	for i := range ids {
+		name, err := d.GetName(ids[i])
+		if err != nil {
+			return nil, err
+		}
+		res[i] = name
+	}
+	return res, nil
+}
+
 // bytesToIds converts a byteslice to uint32s
 func bytesToIds(data []byte) []uint32 {
 	var res = make([]uint32, len(data)/4)
