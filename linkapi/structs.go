@@ -26,12 +26,16 @@ type AllLinksQuery struct {
 }
 
 // Ex: https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&plcontinue=37751%7C0%7CPainted_turtle&pllimit=max&plnamespace=0&prop=links&titles=Turtle
-const LinksToTemplate = `https://%s.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&plcontinue=%s&pllimit=max&plnamespace=0&prop=links&titles=%s`
+const LinksToTemplate = `https://%s.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&pllimit=max&plnamespace=0&prop=links&titles=%s`
 
 type LinksToStruct struct {
-	Batchcomplete bool          `json:"batchcomplete"`
-	Query         LinksToQuery  `json:"query"`
-	Limits        LinksToLimits `json:"limits"`
+	Continue LinksToContinue `json:"continue"`
+	Query    LinksToQuery    `json:"query"`
+	Limits   LinksToLimits   `json:"limits"`
+}
+type LinksToContinue struct {
+	Plcontinue string `json:"plcontinue"`
+	Continue   string `json:"continue"`
 }
 type LinksToLinks struct {
 	Ns    int    `json:"ns"`
