@@ -10,6 +10,7 @@ import (
 var GraphData = map[uint32][]uint32{
 	1: {2, 3}, 2: {1, 7}, 3: {4}, 4: {1, 5}, 5: {2, 3, 8},
 	6: {1, 4}, 7: {3, 6, 10}, 8: {9}, 9: {1}, 10: {8},
+	75: {76}, 76: {77}, 77: {75},
 }
 
 var ShortestPaths = [][]uint32{
@@ -70,5 +71,41 @@ Paths:
 	}
 	if !found {
 		assert.FailNow("did not find shortest path")
+	}
+}
+
+func TestBFSNotFound(t *testing.T) {
+	assert := assert.New(t)
+	// Creating temp dir for testing
+	tempDir := t.TempDir()
+
+	// Creating database
+	db, err := MakeDbHandler(filepath.Join(tempDir, "dbcreate.db"))
+	if !assert.Nil(err, "handler creation should work") {
+		assert.FailNow("handler creation didn't work")
+	}
+	defer db.Close()
+
+	search := MakeSearchHandler(db)
+
+	// Creating bucekts
+	if !assert.Nil(db.CreateBuckets(), "creating buckets should work") {
+		assert.FailNow("creating buckets didn't work")
+	}
+
+	// Creating links
+	for k, v := range GraphData {
+		if err := db.AddLinks(k, v); err != nil {
+			assert.FailNow("should not error adding links")
+		}
+	}
+
+	// Searching shortest path
+	res, err := search.ShortestPath(1, 77, func(u int) {})
+	if err != nil {
+		assert.FailNow("should not error searching")
+	}
+	if res != nil {
+		assert.FailNow("impossible search should not give results")
 	}
 }
