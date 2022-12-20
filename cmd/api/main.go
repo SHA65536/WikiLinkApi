@@ -6,7 +6,7 @@ import (
 
 func main() {
 	// Creating api
-	api, err := linkapi.MakeApiHandler()
+	api, err := linkapi.MakeApiHandler("bolt.db")
 	if err != nil {
 		panic(err)
 	}

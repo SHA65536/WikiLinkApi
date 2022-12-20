@@ -1,7 +1,9 @@
 package linkapi
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -14,7 +16,7 @@ type ApiHandler struct {
 	Router *chi.Mux
 }
 
-func MakeApiHandler() (*ApiHandler, error) {
+func MakeApiHandler(db_path string) (*ApiHandler, error) {
 	var api = &ApiHandler{}
 	var err error
 	// Creating router
@@ -22,15 +24,20 @@ func MakeApiHandler() (*ApiHandler, error) {
 	api.Router.Use(middleware.Logger)
 	api.Router.Get("/search", api.SearchRoute)
 
-	// Creating database
-	if api.DB, err = MakeDbHandler("bolt.db"); err != nil {
+	// Checking DB file exists
+	if _, err := os.Stat("/path/to/whatever"); err != nil {
+		return nil, fmt.Errorf("database file does not exist")
+	}
+
+	// Creating database handler
+	if api.DB, err = MakeDbHandler(db_path); err != nil {
 		return nil, err
 	}
 	if err := api.DB.CreateBuckets(); err != nil {
 		return nil, err
 	}
 
-	// Creating search
+	// Creating search handler
 	api.Search = MakeSearchHandler(api.DB)
 
 	return api, nil
