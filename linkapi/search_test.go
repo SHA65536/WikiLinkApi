@@ -7,13 +7,13 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var GraphData = map[uint32][]uint32{
+var graphDataSearch = map[uint32][]uint32{
 	1: {2, 3}, 2: {1, 7}, 3: {4}, 4: {1, 5}, 5: {2, 3, 8},
 	6: {1, 4}, 7: {3, 6, 10}, 8: {9}, 9: {1}, 10: {8},
 	75: {76}, 76: {77}, 77: {75},
 }
 
-var ShortestPaths = [][]uint32{
+var shortestPaths = [][]uint32{
 	{1, 3, 4, 5, 8, 9},
 	{1, 2, 7, 10, 8, 9},
 }
@@ -38,7 +38,7 @@ func TestBfsSearch(t *testing.T) {
 	}
 
 	// Creating links
-	for k, v := range GraphData {
+	for k, v := range graphDataSearch {
 		if err := db.AddLinks(k, v); err != nil {
 			assert.FailNow("should not error adding links")
 		}
@@ -57,12 +57,12 @@ func TestBfsSearch(t *testing.T) {
 	// Comparing to actual shortest path
 	var found bool
 Paths:
-	for i := range ShortestPaths {
-		if len(ShortestPaths[i]) != len(res) {
+	for i := range shortestPaths {
+		if len(shortestPaths[i]) != len(res) {
 			continue
 		}
 		for j := range res {
-			if res[j] != ShortestPaths[i][j] {
+			if res[j] != shortestPaths[i][j] {
 				continue Paths
 			}
 		}
@@ -94,7 +94,7 @@ func TestBFSNotFound(t *testing.T) {
 	}
 
 	// Creating links
-	for k, v := range GraphData {
+	for k, v := range graphDataSearch {
 		if err := db.AddLinks(k, v); err != nil {
 			assert.FailNow("should not error adding links")
 		}

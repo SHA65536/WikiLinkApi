@@ -25,7 +25,7 @@ func MakeApiHandler(db_path string) (*ApiHandler, error) {
 	api.Router.Get("/search", api.SearchRoute)
 
 	// Checking DB file exists
-	if _, err := os.Stat("/path/to/whatever"); err != nil {
+	if _, err := os.Stat(db_path); err != nil {
 		return nil, fmt.Errorf("database file does not exist")
 	}
 
@@ -91,6 +91,13 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	res.ResultTitles, err = a.DB.IdsToNames(res.ResultIds...)
 	if err != nil {
 		res.Error = "error parsing path!"
+		render.JSON(w, r, res)
+		return
+	}
+
+	// Checking for no path
+	if len(res.ResultIds) == 0 {
+		res.Error = "no path found!"
 		render.JSON(w, r, res)
 		return
 	}
