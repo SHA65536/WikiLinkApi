@@ -1,6 +1,10 @@
 # WikiLink
 This is a repository for scraping, storing, and searching links between wikipedia articles.
 
+<p>
+   <img src="https://raw.githubusercontent.com/SHA65536/WikipediaProject/main/.github/wiki.gif" width="100%" alt="WikiLink">
+</p>
+
 # Scraping
 `scrape.go` contains methods for getting all articles from a regional wikipedia, and getting all links from a list of articles.
 
