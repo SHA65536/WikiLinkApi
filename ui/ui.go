@@ -20,16 +20,14 @@ func MakeUIHandler(locale string, api_url string) (*UIHandler, error) {
 	}
 	ui.Router = chi.NewRouter()
 	ui.Router.Use(middleware.Logger)
-	// Input search for starting article
-	ui.Router.Get("/searchstart", ui.SearchStartRoute)
-	// Selection for starting article
-	ui.Router.Get("/selectstart", ui.SelectStartRoute)
-	// Input search for ending article
-	ui.Router.Get("/searchend", ui.SearchEndRoute)
-	// Selection for ending article
-	ui.Router.Get("/selectend", ui.SelectEndRoute)
-	// Results display
-	ui.Router.Get("/results", ui.ResultsDisplayRoute)
+	// Main route
+	ui.Router.Get("/", ui.MainRoute)
+	// Search route
+	ui.Router.Get("/search", ui.SearchRoute)
+	// Random route
+	ui.Router.Get("/search", ui.RandomRoute)
+	// Result route
+	ui.Router.Get("/search", ui.ResultRoute)
 	return ui, nil
 }
 
@@ -37,27 +35,22 @@ func (u *UIHandler) Serve(addr string) error {
 	return http.ListenAndServe(addr, u.Router)
 }
 
-// Input search for starting article
-func (u *UIHandler) SearchStartRoute(w http.ResponseWriter, r *http.Request) {
+// Main webpage route
+func (u *UIHandler) MainRoute(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Selection for starting article
-func (u *UIHandler) SelectStartRoute(w http.ResponseWriter, r *http.Request) {
+// Search for articles
+func (u *UIHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Input search for ending article
-func (u *UIHandler) SearchEndRoute(w http.ResponseWriter, r *http.Request) {
+// Random Articles
+func (u *UIHandler) RandomRoute(w http.ResponseWriter, r *http.Request) {
 
 }
 
-// Selection for ending article
-func (u *UIHandler) SelectEndRoute(w http.ResponseWriter, r *http.Request) {
-
-}
-
-// Results display
-func (u *UIHandler) ResultsDisplayRoute(w http.ResponseWriter, r *http.Request) {
+// Results for path
+func (u *UIHandler) ResultRoute(w http.ResponseWriter, r *http.Request) {
 
 }
