@@ -139,5 +139,5 @@ function Search() {
     }
     const dst = selectedLeft.childNodes[1].childNodes[1].textContent
     const src = selectedRight.childNodes[1].childNodes[1].textContent
-    window.location.href = `http://localhost:2048/search?start=${src}&end=${dst}`
+    window.location.href = `/result?start=${src}&end=${dst}`
 }

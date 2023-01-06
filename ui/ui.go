@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/url"
 
@@ -75,7 +76,6 @@ func (u *UIHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("error, please provide a query"))
 		return
 	}
-	fmt.Println(WikiSearchEndpoint + url.QueryEscape(query))
 	resp, err := u.Client.Get(WikiSearchEndpoint + url.QueryEscape(query))
 	if err != nil {
 		w.Write([]byte("error, search failed"))
@@ -106,5 +106,27 @@ func (u *UIHandler) RandomRoute(w http.ResponseWriter, r *http.Request) {
 
 // Results for path
 func (u *UIHandler) ResultRoute(w http.ResponseWriter, r *http.Request) {
+	start := r.URL.Query().Get("start")
+	end := r.URL.Query().Get("end")
+	// Must have both params
+	if end == "" || start == "" {
+		w.Write([]byte("error, start and end must be params"))
+		return
+	}
+	resp, err := u.Client.Get(fmt.Sprintf("http://%s/search?start=%s&end=%s", u.LinkAPI, url.QueryEscape(start), url.QueryEscape(end)))
+	if err != nil {
+		w.Write([]byte("error, search failed"))
+		fmt.Println(err)
+		return
+	}
+	defer resp.Body.Close()
 
+	data, err := io.ReadAll(resp.Body)
+	if err != nil {
+		w.Write([]byte("error, search failed"))
+		fmt.Println(err)
+		return
+	}
+
+	w.Write(data)
 }
