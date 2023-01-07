@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -104,7 +105,25 @@ func (u *UIHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 
 // Random Articles
 func (u *UIHandler) RandomRoute(w http.ResponseWriter, r *http.Request) {
+	var res = &SearchResponse{}
+	var links = make([]SearchArticle, 10)
+	var wg sync.WaitGroup
 
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+
+		i := i
+		go func() {
+			defer wg.Done()
+			u.GetRandom(links, i)
+		}()
+	}
+
+	wg.Wait()
+
+	res.Result = links
+
+	render.JSON(w, r, res)
 }
 
 // Results for path
@@ -133,4 +152,34 @@ func (u *UIHandler) ResultRoute(w http.ResponseWriter, r *http.Request) {
 	}
 
 	render.JSON(w, r, res)
+}
+
+func (u *UIHandler) GetRandom(out []SearchArticle, idx int) {
+	var res = &RandomResult{}
+	var page string
+	resp, err := u.Client.Get(WikiRandomEndpoint)
+	if err != nil {
+		out[idx] = SearchArticle{
+			Title:   "Error getting random!",
+			Snippet: "Error getting random!",
+			Pageid:  -1,
+		}
+		return
+	}
+	defer resp.Body.Close()
+	if err := json.NewDecoder(resp.Body).Decode(res); err != nil {
+		out[idx] = SearchArticle{
+			Title:   "Error getting random!",
+			Snippet: "Error getting random!",
+			Pageid:  -1,
+		}
+		return
+	}
+	for page = range res.Query.Pages {
+	}
+	out[idx] = SearchArticle{
+		Title:   res.Query.Pages[page].Title,
+		Snippet: res.Query.Pages[page].Extract,
+		Pageid:  res.Query.Pages[page].Pageid,
+	}
 }

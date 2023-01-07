@@ -29,6 +29,33 @@ type SearchQuery struct {
 	Search     []Search   `json:"search"`
 }
 
+// Random results from wikipedia
+type RandomResult struct {
+	Batchcomplete string         `json:"batchcomplete"`
+	Continue      RandomContinue `json:"continue"`
+	Query         RandomQuery    `json:"query"`
+}
+type RandomContinue struct {
+	Grncontinue string `json:"grncontinue"`
+	Continue    string `json:"continue"`
+}
+type RandomPage struct {
+	Pageid               int       `json:"pageid"`
+	Ns                   int       `json:"ns"`
+	Title                string    `json:"title"`
+	Contentmodel         string    `json:"contentmodel"`
+	Pagelanguage         string    `json:"pagelanguage"`
+	Pagelanguagehtmlcode string    `json:"pagelanguagehtmlcode"`
+	Pagelanguagedir      string    `json:"pagelanguagedir"`
+	Touched              time.Time `json:"touched"`
+	Lastrevid            int       `json:"lastrevid"`
+	Length               int       `json:"length"`
+	Extract              string    `json:"extract"`
+}
+type RandomQuery struct {
+	Pages map[string]RandomPage `json:"pages"`
+}
+
 // Search Response from the search route
 type SearchResponse struct {
 	Error  string          `json:"error,omitempty"`

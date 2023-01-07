@@ -72,6 +72,16 @@ async function searchWikipedia(searchQuery) {
     return json;
 }
 
+// Gets random pages from wikipedia and returns the results
+async function randomWikipedia() {
+    const response = await fetch(wikiendpointRandom);
+    if (!response.ok) {
+        throw Error(response.statusText);
+    }
+    const json = await response.json();
+    return json;
+}
+
 // Displays the results on the given side
 function displayResults(results, side, sideclass) {
     results.result.forEach(result => {
@@ -94,42 +104,24 @@ async function RandomArticle() {
     selectedLeft = false;
     rightresults.innerHTML = '';
     selectedRight = false;
-    for (i = 0; i < 5; i++) {
-        const response = await fetch(wikiendpointRandom);
-        if (!response.ok) {
-            throw Error(response.statusText);
+    const results = await randomWikipedia();
+    results.result.forEach((result, index) => {
+        let side = leftresults;
+        let sideclass = "left-item";
+        if (index % 2 == 0) {
+            side = rightresults;
+            sideclass = "right-item";
         }
-        const json = await response.json();
-        const result = Object.values(json.query.pages)[0]
-        const url = `https://en.wikipedia.org/?curid=${result.pageid}`;
-        rightresults.insertAdjacentHTML(
+        side.insertAdjacentHTML(
             "beforeend",
-            `<button class="result-item right-item" onClick="handleSelect(event, 'right-item')">
+            `<button class="result-item ${sideclass}" onClick="handleSelect(event, '${sideclass}')">
                 <h5 class="result-title">
                     <span>${result.title}</span><br>
                 </h5>
-                <span class="result-snippet">${result.extract}</span><br>
+                <span class="result-snippet">${result.snippet}</span><br>
             </button><br>`
         );
-    }
-    for (i = 0; i < 5; i++) {
-        const response = await fetch(wikiendpointRandom);
-        if (!response.ok) {
-            throw Error(response.statusText);
-        }
-        const json = await response.json();
-        const result = Object.values(json.query.pages)[0]
-        const url = `https://en.wikipedia.org/?curid=${result.pageid}`;
-        leftresults.insertAdjacentHTML(
-            "beforeend",
-            `<button class="result-item left-item" onClick="handleSelect(event, 'left-item')">
-                <h3 class="result-title">
-                    <span>${result.title}</span><br>
-                </h3>
-                <span class="result-snippet">${result.extract}</span><br>
-            </button><br>`
-        );
-    }
+    });
 }
 
 // Goes to the path search page with current selected stuff
