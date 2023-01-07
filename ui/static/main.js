@@ -74,7 +74,7 @@ async function searchWikipedia(searchQuery) {
 
 // Displays the results on the given side
 function displayResults(results, side, sideclass) {
-    results.query.search.forEach(result => {
+    results.result.forEach(result => {
         const url = `https://en.wikipedia.org/?curid=${result.pageid}`;
         side.insertAdjacentHTML(
             "beforeend",

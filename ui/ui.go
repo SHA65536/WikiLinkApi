@@ -4,7 +4,6 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
-	"io"
 	"net/http"
 	"net/url"
 
@@ -70,33 +69,37 @@ func (u *UIHandler) MainRoute(w http.ResponseWriter, r *http.Request) {
 
 // Search for articles
 func (u *UIHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
-	var res = &SearchResult{}
+	var wikires = &SearchResult{}
+	var qres = &SearchResponse{}
 	query := r.URL.Query().Get("q")
 	if query == "" {
-		w.Write([]byte("error, please provide a query"))
+		qres.Error = "must have query parameter!"
+		render.JSON(w, r, qres)
 		return
 	}
 	resp, err := u.Client.Get(WikiSearchEndpoint + url.QueryEscape(query))
 	if err != nil {
-		w.Write([]byte("error, search failed"))
-		fmt.Println(err)
+		qres.Error = "failed reaching to wikipedia!"
+		render.JSON(w, r, qres)
 		return
 	}
 	defer resp.Body.Close()
 
-	if err != nil {
-		w.Write([]byte("error, search failed"))
-		fmt.Println(err)
+	if err := json.NewDecoder(resp.Body).Decode(wikires); err != nil {
+		qres.Error = "failed decoding response from wikipedia!"
+		render.JSON(w, r, qres)
 		return
 	}
 
-	if err := json.NewDecoder(resp.Body).Decode(res); err != nil {
-		w.Write([]byte("error, search failed"))
-		fmt.Println(err)
-		return
+	for _, s := range wikires.Query.Search {
+		qres.Result = append(qres.Result, SearchArticle{
+			Title:   s.Title,
+			Snippet: s.Snippet,
+			Pageid:  s.Pageid,
+		})
 	}
 
-	render.JSON(w, r, res)
+	render.JSON(w, r, qres)
 }
 
 // Random Articles
@@ -106,27 +109,28 @@ func (u *UIHandler) RandomRoute(w http.ResponseWriter, r *http.Request) {
 
 // Results for path
 func (u *UIHandler) ResultRoute(w http.ResponseWriter, r *http.Request) {
+	var res = &ResultResponse{}
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
 	// Must have both params
 	if end == "" || start == "" {
-		w.Write([]byte("error, start and end must be params"))
+		res.Error = "must have start and end parameters!"
+		render.JSON(w, r, res)
 		return
 	}
 	resp, err := u.Client.Get(fmt.Sprintf("http://%s/search?start=%s&end=%s", u.LinkAPI, url.QueryEscape(start), url.QueryEscape(end)))
 	if err != nil {
-		w.Write([]byte("error, search failed"))
-		fmt.Println(err)
+		res.Error = "failed getting response from link api!"
+		render.JSON(w, r, res)
 		return
 	}
 	defer resp.Body.Close()
 
-	data, err := io.ReadAll(resp.Body)
-	if err != nil {
-		w.Write([]byte("error, search failed"))
-		fmt.Println(err)
+	if err := json.NewDecoder(resp.Body).Decode(res); err != nil {
+		res.Error = "failed decoding response from link api!"
+		render.JSON(w, r, res)
 		return
 	}
 
-	w.Write(data)
+	render.JSON(w, r, res)
 }

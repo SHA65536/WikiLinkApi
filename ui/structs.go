@@ -2,6 +2,7 @@ package ui
 
 import "time"
 
+// Search Result from Wikipedia
 type SearchResult struct {
 	Batchcomplete string         `json:"batchcomplete"`
 	Continue      SearchContinue `json:"continue"`
@@ -26,4 +27,23 @@ type Search struct {
 type SearchQuery struct {
 	Searchinfo Searchinfo `json:"searchinfo"`
 	Search     []Search   `json:"search"`
+}
+
+// Search Response from the search route
+type SearchResponse struct {
+	Error  string          `json:"error,omitempty"`
+	Result []SearchArticle `json:"result,omitempty"`
+}
+
+type SearchArticle struct {
+	Title   string `json:"title"`
+	Snippet string `json:"snippet"`
+	Pageid  int    `json:"pageid"`
+}
+
+// Result Response from result route
+type ResultResponse struct {
+	Error        string   `json:"error,omitempty"`
+	ResultIds    []uint32 `json:"ids,omitempty"`
+	ResultTitles []string `json:"titles,omitempty"`
 }
