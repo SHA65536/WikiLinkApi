@@ -4,11 +4,11 @@ const rightform = document.getElementById('right-search-form');
 const leftresults = document.getElementById('left-search-results');
 const rightresults = document.getElementById('right-search-results');
 
-const wikiendpointSearch = `/search?q=`
-const wikiendpointRandom = `/random`
+const wikiendpointSearch = `/search?q=`;
+const wikiendpointRandom = `/random`;
 
-let selectedLeft = false
-let selectedRight = false
+var selectedLeft = false;
+var selectedRight = false;
 
 leftform.addEventListener('submit', handleSubmitLeft);
 rightform.addEventListener('submit', handleSubmitRight);
@@ -49,13 +49,13 @@ async function handleSelect(event, side) {
         if (selectedLeft != false) {
             selectedLeft.classList.toggle('selected-button');
         }
-        selectedLeft = event.originalTarget;
+        selectedLeft = event.target;
         selectedLeft.classList.toggle('selected-button');
     } else {
         if (selectedRight != false) {
             selectedRight.classList.toggle('selected-button');
         }
-        selectedRight = event.originalTarget;
+        selectedRight = event.target;
         selectedRight.classList.toggle('selected-button');
     }
     console.log(side, event);
