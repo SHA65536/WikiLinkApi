@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 	"net/url"
 	"sync"
@@ -16,8 +17,11 @@ import (
 const WikiSearchEndpoint = `https://he.wikipedia.org/w/api.php?action=query&list=search&srnamespace=0&srlimit=5&prop=info&utf8=&format=json&origin=*&srsearch=`
 const WikiRandomEndpoint = "https://he.wikipedia.org/w/api.php?action=query&generator=random&grnnamespace=0&grnlimit=1&prop=info|extracts&exlimit=1&explaintext=true&exsentences=1&utf8=&format=json&origin=*"
 
-//go:embed static/styles.css
-var styles []byte
+//go:embed static/indexstyles.css
+var indexstyles []byte
+
+//go:embed static/resultstyles.css
+var resultstyles []byte
 
 //go:embed static/main.js
 var mainjs []byte
@@ -25,19 +29,25 @@ var mainjs []byte
 //go:embed static/index.html
 var indexhtml []byte
 
+//go:embed static/results.html
+var resultshtml string
+
 type UIHandler struct {
-	Locale  string
-	LinkAPI string
-	Client  *http.Client
-	Router  *chi.Mux
+	Locale      string
+	LinkAPI     string
+	Client      *http.Client
+	Router      *chi.Mux
+	ResultTempl *template.Template
 }
 
 func MakeUIHandler(locale string, api_url string) (*UIHandler, error) {
 	var ui = &UIHandler{
-		Locale:  locale,
-		LinkAPI: api_url,
-		Client:  http.DefaultClient,
+		Locale:      locale,
+		LinkAPI:     api_url,
+		Client:      http.DefaultClient,
+		ResultTempl: template.Must(template.New("results").Parse(resultshtml)),
 	}
+
 	ui.Router = chi.NewRouter()
 	ui.Router.Use(middleware.Logger)
 	// Main route
@@ -53,8 +63,11 @@ func MakeUIHandler(locale string, api_url string) (*UIHandler, error) {
 	ui.Router.Get("/main.js", func(w http.ResponseWriter, r *http.Request) {
 		w.Write(mainjs)
 	})
-	ui.Router.Get("/styles.css", func(w http.ResponseWriter, r *http.Request) {
-		w.Write(styles)
+	ui.Router.Get("/indexstyles.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Write(indexstyles)
+	})
+	ui.Router.Get("/resultstyles.css", func(w http.ResponseWriter, r *http.Request) {
+		w.Write(resultstyles)
 	})
 	return ui, nil
 }
@@ -151,7 +164,7 @@ func (u *UIHandler) ResultRoute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	render.JSON(w, r, res)
+	u.ResultTempl.Execute(w, res)
 }
 
 func (u *UIHandler) GetRandom(out []SearchArticle, idx int) {
