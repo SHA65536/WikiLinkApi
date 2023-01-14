@@ -4,14 +4,20 @@ const rightform = document.getElementById('right-search-form');
 const leftresults = document.getElementById('left-search-results');
 const rightresults = document.getElementById('right-search-results');
 
+const leftsearchform = document.getElementById('left-search-input');
+const rightsearchform = document.getElementById('right-search-input')
+
 const wikiendpointSearch = `/search?q=`;
 const wikiendpointRandom = `/random`;
 
 var selectedLeft = false;
 var selectedRight = false;
 
-leftform.addEventListener('submit', handleSubmitLeft);
-rightform.addEventListener('submit', handleSubmitRight);
+leftform.addEventListener('submit', (event) => { event.preventDefault() });
+rightform.addEventListener('submit', (event) => { event.preventDefault() });
+
+leftsearchform.addEventListener('change', handleSubmitLeft);
+rightsearchform.addEventListener('change', handleSubmitRight);
 
 // Handles search of start article
 async function handleSubmitLeft(event) {
