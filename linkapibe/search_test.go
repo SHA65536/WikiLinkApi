@@ -1,4 +1,4 @@
-package linkapi
+package linkapibe
 
 import (
 	"path/filepath"

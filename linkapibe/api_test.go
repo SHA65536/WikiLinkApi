@@ -1,4 +1,4 @@
-package linkapi
+package linkapibe
 
 import (
 	"encoding/json"

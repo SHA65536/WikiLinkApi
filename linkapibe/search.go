@@ -1,4 +1,4 @@
-package linkapi
+package linkapibe
 
 type SearchHandler struct {
 	DB *DatabaseHandler

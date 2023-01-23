@@ -1,4 +1,4 @@
-module github.com/sha65536/wikilink
+module github.com/sha65536/linkapibe
 
 go 1.19
 

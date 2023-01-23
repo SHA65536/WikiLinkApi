@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/sha65536/wikilink/linkapi"
+	"github.com/sha65536/linkapibe/linkapibe"
 	"github.com/urfave/cli/v2"
 )
 
@@ -32,7 +32,7 @@ func main() {
 			},
 		},
 		Action: func(ctx *cli.Context) error {
-			api, err := linkapi.MakeApiHandler(db_path)
+			api, err := linkapibe.MakeApiHandler(db_path)
 			if err != nil {
 				return err
 			}
