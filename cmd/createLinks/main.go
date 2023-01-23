@@ -5,14 +5,14 @@ import (
 
 	"github.com/schollz/progressbar/v3"
 
-	"github.com/sha65536/linkapibe/linkapibe"
+	"github.com/sha65536/wikilinkapi/wikilinkapi"
 )
 
 const NUMWORKERS = 10
 
 func main() {
 	// Creating db handler
-	db, err := linkapibe.MakeDbHandler("bolt.db")
+	db, err := wikilinkapi.MakeDbHandler("bolt.db")
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +30,7 @@ func main() {
 	}
 
 	// Creating scrape handler
-	sc := linkapibe.MakeScrapeHandler(db)
+	sc := wikilinkapi.MakeScrapeHandler(db)
 	bar := progressbar.Default(int64(len(arts)))
 
 	// Creating workers
@@ -61,7 +61,7 @@ type Art struct {
 	Id   uint32
 }
 
-func downloadWorker(sc *linkapibe.ScrapeHandler, in chan Art, arts map[string]uint32) {
+func downloadWorker(sc *wikilinkapi.ScrapeHandler, in chan Art, arts map[string]uint32) {
 	for val := range in {
 		// Getting all links
 		sc.GetAllLinks("he", val.Name, func(s []string) {

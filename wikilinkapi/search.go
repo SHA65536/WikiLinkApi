@@ -1,4 +1,4 @@
-package linkapibe
+package wikilinkapi
 
 type SearchHandler struct {
 	DB *DatabaseHandler

@@ -1,4 +1,4 @@
-module github.com/sha65536/linkapibe
+module github.com/sha65536/wikilinkapi
 
 go 1.19
 

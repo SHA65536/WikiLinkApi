@@ -1,4 +1,4 @@
-package linkapibe
+package wikilinkapi
 
 import (
 	"path/filepath"

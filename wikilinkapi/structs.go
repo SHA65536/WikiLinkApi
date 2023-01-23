@@ -1,4 +1,4 @@
-package linkapibe
+package wikilinkapi
 
 // Ex: "https://en.wikipedia.org/w/api.php?action=query&format=json&formatversion=2&gapcontinue=%22Boss%22_Tweed&gapfilterredir=nonredirects&gaplimit=max&gapnamespace=0&generator=allpages"
 const AllLinksTemplate = `https://%s.wikipedia.org/w/api.php?action=query&generator=allpages&gapnamespace=0&gaplimit=max&format=json&formatversion=2&gapfilterredir=nonredirects`

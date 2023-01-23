@@ -3,12 +3,12 @@ package main
 import (
 	"log"
 
-	"github.com/sha65536/linkapibe/linkapibe"
+	"github.com/sha65536/wikilinkapi/wikilinkapi"
 )
 
 func main() {
 	// Creating db handler
-	db, err := linkapibe.MakeDbHandler("bolt.db")
+	db, err := wikilinkapi.MakeDbHandler("bolt.db")
 	if err != nil {
 		panic(err)
 	}
@@ -21,7 +21,7 @@ func main() {
 
 	// Creating scrape handler
 	var count uint32
-	sc := linkapibe.MakeScrapeHandler(db)
+	sc := wikilinkapi.MakeScrapeHandler(db)
 	err = sc.GetAllArticles("he", func(s []string) {
 		for i := range s {
 			if err := sc.DB.CreateArticle(s[i], count); err != nil {
