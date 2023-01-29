@@ -13,8 +13,8 @@ func main() {
 	var db_path string
 
 	app := &cli.App{
-		Name:        "linkapi",
-		Description: "Serves the link api",
+		Name:  "linkapi",
+		Usage: "Serves the WikiLink api",
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:        "port",

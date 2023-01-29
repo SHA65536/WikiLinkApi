@@ -1,4 +1,4 @@
-# WikiLink
+# WikiLinkAPI
 This is a repository for scraping, storing, and searching links between wikipedia articles.
 
 <p>
@@ -21,13 +21,10 @@ The `cmd` directory contains some useful scripts for scraping articles and links
 To run the api run `go run ./cmd/linkapi`:
 ```
 NAME:
-   linkapi - A new cli application
+   linkapi - Serves the WikiLink api
 
 USAGE:
    linkapi [global options] command [command options] [arguments...]
-
-DESCRIPTION:
-   Serves the link api
 
 COMMANDS:
    help, h  Shows a list of commands or help for one command
