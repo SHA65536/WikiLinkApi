@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -40,7 +41,7 @@ func TestApi(t *testing.T) {
 	tempDir := t.TempDir()
 
 	// Trying to create handler when db doesn't exist
-	_, err := MakeApiHandler(filepath.Join(tempDir, "api_test.db"))
+	_, err := MakeApiHandler(filepath.Join(tempDir, "api_test.db"), zerolog.Disabled, io.Discard)
 	if !assert.NotNil(err) {
 		assert.FailNow("Creating api handler without database should error")
 	}
@@ -73,7 +74,7 @@ func TestApi(t *testing.T) {
 	handler.Close()
 
 	// Making Api Handler
-	api, err := MakeApiHandler(filepath.Join(tempDir, "api_test.db"))
+	api, err := MakeApiHandler(filepath.Join(tempDir, "api_test.db"), zerolog.Disabled, io.Discard)
 	if !assert.Nil(err, "handler creation should work") {
 		assert.FailNow("handler creation didn't work")
 	}
