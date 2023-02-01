@@ -71,13 +71,14 @@ type SearchResult struct {
 func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	var res SearchResult
 	sTime := time.Now()
+	log := a.Logger.With().Str("ip", r.RemoteAddr).Str("path", r.URL.Path).Str("route", "search").Logger()
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
 	// Must have both params
 	if end == "" || start == "" {
 		res.Error = "must have 'start' and 'end' parameters!"
 		render.JSON(w, r, res)
-		a.Logger.Info().Str("took", timeToMs(time.Since(sTime))).Str("src", r.Host).Str("dst", "/search").Msg("not enough params in request")
+		ReqLog(log, w, r, sTime, "invalid parameters", zerolog.InfoLevel)
 		return
 	}
 	// Finding start param
@@ -85,7 +86,7 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Error = "start article not found!"
 		render.JSON(w, r, res)
-		a.Logger.Info().Str("took", timeToMs(time.Since(sTime))).Str("src", r.Host).Str("dst", "/search").Msgf("article %s not found", start)
+		ReqLog(log, w, r, sTime, "article not found", zerolog.InfoLevel)
 		return
 	}
 	// Finding end param
@@ -93,7 +94,7 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Error = "end article not found!"
 		render.JSON(w, r, res)
-		a.Logger.Info().Str("took", timeToMs(time.Since(sTime))).Str("src", r.Host).Str("dst", "/search").Msgf("article %s not found", end)
+		ReqLog(log, w, r, sTime, "article not found", zerolog.InfoLevel)
 		return
 	}
 
@@ -102,7 +103,7 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Error = "could not find path!"
 		render.JSON(w, r, res)
-		a.Logger.Warn().Str("took", timeToMs(time.Since(sTime))).Str("src", r.Host).Str("dst", "/search").Msgf("path not found %s - %s", start, end)
+		ReqLog(log, w, r, sTime, "path not found", zerolog.InfoLevel)
 		return
 	}
 
@@ -111,7 +112,7 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.Error = "error parsing path!"
 		render.JSON(w, r, res)
-		a.Logger.Warn().Str("took", timeToMs(time.Since(sTime))).Str("src", r.Host).Str("dst", "/search").Msgf("error parsing path %s - %s", start, end)
+		ReqLog(log, w, r, sTime, "error parsing path", zerolog.WarnLevel)
 		return
 	}
 
@@ -119,13 +120,17 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	if len(res.ResultIds) == 0 {
 		res.Error = "no path found!"
 		render.JSON(w, r, res)
-		a.Logger.Info().Str("took", timeToMs(time.Since(sTime))).Str("src", r.Host).Str("dst", "/search").Msgf("no path %s - %s", start, end)
+		ReqLog(log, w, r, sTime, "no path", zerolog.InfoLevel)
 		return
 	}
 	render.JSON(w, r, res)
-	a.Logger.Info().Str("took", timeToMs(time.Since(sTime))).Str("src", r.Host).Str("dst", "/search").Msg("success")
+	ReqLog(log, w, r, sTime, "success", zerolog.InfoLevel)
 }
 
 func timeToMs(t time.Duration) string {
 	return fmt.Sprintf("%dms", t/time.Millisecond)
+}
+
+func ReqLog(Logger zerolog.Logger, w http.ResponseWriter, r *http.Request, s time.Time, msg string, level zerolog.Level) {
+	Logger.WithLevel(level).Str("took", timeToMs(time.Since(s))).Msg(msg)
 }

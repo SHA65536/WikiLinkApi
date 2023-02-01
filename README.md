@@ -32,6 +32,7 @@ COMMANDS:
 GLOBAL OPTIONS:
    --port value, -p value  Port to listen to (default: "2048")
    --db value, -d value    Path to the database (default: "bolt.db")
+   --log value, -l value   Level of log to be shown ("trace", "debug", "info", "warn", "error", "fatal", "panic") (default: "info")
    --help, -h              show help (default: false)
 ``` 
 
