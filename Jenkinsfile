@@ -15,7 +15,7 @@ pipeline {
         stage('Test') {
             steps {
                 // Test the application
-                sh "go test ./..."
+                sh "export GOCACHE=/tmp/.cache; go test ./..."
             }
         }
         stage('Push') {
