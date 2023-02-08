@@ -2,13 +2,13 @@ pipeline {
     agent {
         docker {
             image 'golang:latest'
-            args '--mount=type=bind,source=$HOME/.cache/go-build,target=/.cache/go-build'
         }
     }
 
     stages {
         stage('Build') {
             steps {
+                export XDG_CACHE_HOME=/tmp/.cache
                 // Build the application
                 sh "go build ./cmd/linkapi"
             }
