@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                export XDG_CACHE_HOME=/tmp/.cache
+                sh "export XDG_CACHE_HOME=/tmp/.cache"
                 // Build the application
                 sh "go build ./cmd/linkapi"
             }
