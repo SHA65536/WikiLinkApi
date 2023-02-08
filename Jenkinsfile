@@ -2,6 +2,7 @@ pipeline {
     agent {
         docker {
             image 'golang:latest'
+            args '--mount=type=bind,source=$HOME/.cache/go-build,target=/.cache/go-build'
         }
     }
 
