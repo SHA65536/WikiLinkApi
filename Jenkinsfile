@@ -8,11 +8,8 @@ pipeline {
     stages {
         stage('Build') {
             steps {
-                sh "GOCACHE=/tmp/.cache"
-                sh "export GOCACHE"
-                sh "go env GOCACHE"
                 // Build the application
-                sh "go build ./cmd/linkapi"
+                sh "export GOCACHE=/tmp/.cache; go build ./cmd/linkapi"
             }
         }
         stage('Test') {
