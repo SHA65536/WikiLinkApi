@@ -7,7 +7,7 @@ pipeline {
         stage('Build') {
             steps {
                 // Build the application
-                sh "go build ./cmd/linkapi"
+                sh "go build ./cmd/wikilinkapi"
             }
         }
         stage('Test') {
@@ -19,7 +19,7 @@ pipeline {
         stage('Push') {
             steps {
                 // Push to S3
-                sh "aws s3 cp ./linkapi s3://cloudschoolproject-buildartifacts/linkapi"
+                sh "aws s3 cp ./linkapi s3://cloudschoolproject-buildartifacts/wikilinkapi_v_$BUILD_NUMBER"
             }
         }
     }
