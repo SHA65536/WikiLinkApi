@@ -31,6 +31,7 @@ func MakeApiHandler(db_path string, logLevel zerolog.Level, writer io.Writer) (*
 	// Creating router
 	api.Router = chi.NewRouter()
 	api.Router.Get("/search", api.SearchRoute)
+	api.Router.Get("/health", api.HealthRoute)
 	api.Logger.Debug().Msg("created router")
 
 	// Checking DB file exists
@@ -68,6 +69,7 @@ type SearchResult struct {
 	ResultTitles []string `json:"titles,omitempty"`
 }
 
+// SearchRoute handles searching path between two articles
 func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	var res SearchResult
 	sTime := time.Now()
@@ -125,6 +127,11 @@ func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	}
 	render.JSON(w, r, res)
 	ReqLog(log, w, r, sTime, "success", zerolog.InfoLevel)
+}
+
+// HealthRoute for health checking purposes
+func (a *ApiHandler) HealthRoute(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("ok"))
 }
 
 func timeToMs(t time.Duration) string {
