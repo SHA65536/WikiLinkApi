@@ -21,7 +21,7 @@ func main() {
 		// LOG_LEVEL
 		loglevel string = "info"
 		// LOG_PATH
-		logpath string = "/var/wikilinkapi/wikilinkapi.loh"
+		logpath string = "/var/wikilinkapi/wikilinkapi.log"
 	)
 
 	app := &cli.App{
