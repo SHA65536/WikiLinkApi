@@ -7,7 +7,8 @@ pipeline {
         stage('Build') {
             steps {
                 // Build the application
-                sh "go build ./cmd/wikilinkapi -o wikilinkapi_v_$BUILD_NUMBER"
+                sh "mkdir output"
+                sh "go build -o output ./cmd/wikilinkapi"
             }
         }
         stage('Test') {
@@ -19,7 +20,7 @@ pipeline {
         stage('Push') {
             steps {
                 // Push to S3
-                sh "aws s3 cp ./wikilinkapi_v_$BUILD_NUMBER s3://cloudschoolproject-buildartifacts/wikilinkapi_v_$BUILD_NUMBER"
+                sh "aws s3 cp ./output/wikilinkapi s3://cloudschoolproject-buildartifacts/wikilinkapi_v_$BUILD_NUMBER"
             }
         }
     }
