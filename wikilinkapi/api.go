@@ -16,7 +16,7 @@ type ApiHandler struct {
 	DB     *DatabaseHandler
 	Search *SearchHandler
 	Router *chi.Mux
-	Logger zerolog.Logger
+	Logger *LoggingHandler
 }
 
 func MakeApiHandler(db_path string, logLevel zerolog.Level, writer io.Writer) (*ApiHandler, error) {
@@ -24,42 +24,43 @@ func MakeApiHandler(db_path string, logLevel zerolog.Level, writer io.Writer) (*
 	var err error
 
 	// Creating logger
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	logwriter := io.MultiWriter(os.Stdout, writer)
-	api.Logger = zerolog.New(logwriter).With().Str("service", "linkapi").Timestamp().Logger().Level(logLevel)
+	api.Logger, err = MakeLoggingHandler(logLevel, writer)
+	if err != nil {
+		return nil, err
+	}
 
 	// Creating router
 	api.Router = chi.NewRouter()
 	api.Router.Get("/search", api.SearchRoute)
 	api.Router.Get("/health", api.HealthRoute)
-	api.Logger.Debug().Msg("created router")
+	api.Logger.Logger.Debug().Msg("created router")
 
 	// Checking DB file exists
 	if _, err := os.Stat(db_path); err != nil {
-		api.Logger.Error().Msgf("database not found! %s", db_path)
+		api.Logger.Logger.Error().Msgf("database not found! %s", db_path)
 		return nil, fmt.Errorf("database file does not exist")
 	}
 
 	// Creating database handler
 	if api.DB, err = MakeDbHandler(db_path); err != nil {
-		api.Logger.Error().Msgf("error creating db handler! %s", err)
+		api.Logger.Logger.Error().Msgf("error creating db handler! %s", err)
 		return nil, err
 	}
 	if err := api.DB.CreateBuckets(); err != nil {
-		api.Logger.Error().Msgf("error creating db buckers! %s", err)
+		api.Logger.Logger.Error().Msgf("error creating db buckers! %s", err)
 		return nil, err
 	}
 
 	// Creating search handler
 	api.Search = MakeSearchHandler(api.DB)
-	api.Logger.Info().Msg("created handler succesfully!")
+	api.Logger.Logger.Info().Msg("created handler succesfully!")
 
 	return api, nil
 }
 
 func (a *ApiHandler) Serve(addr string) error {
 	defer a.DB.Close()
-	a.Logger.Info().Msgf("serving linkapi on %s", addr)
+	a.Logger.Logger.Info().Msgf("serving linkapi on %s", addr)
 	return http.ListenAndServe(addr, a.Router)
 }
 
@@ -73,7 +74,7 @@ type SearchResult struct {
 func (a *ApiHandler) SearchRoute(w http.ResponseWriter, r *http.Request) {
 	var res SearchResult
 	sTime := time.Now()
-	log := a.Logger.With().Str("ip", r.RemoteAddr).Str("path", r.URL.Path).Str("route", "search").Logger()
+	log := a.Logger.Logger.With().Str("ip", r.RemoteAddr).Str("path", r.URL.Path).Str("route", "search").Logger()
 	start := r.URL.Query().Get("start")
 	end := r.URL.Query().Get("end")
 	// Must have both params
